@@ -1,0 +1,21 @@
+{% extends "navbar.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block extra_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/inicio.css') }}" />
+{% endblock %}
+
+{% block body %}
+<div>
+    <h1>El form Login</h1>
+    <form action="" method="POST">
+        {{ form.hidden_tag() }}
+        {{ form.dni }}
+        {{ form.contraseña }}
+        {{ form.submit }}
+    </form>
+
+    <a href="{{ url_for('registrarse') }}">Registrarse</a>
+</div>
+{% endblock %}
