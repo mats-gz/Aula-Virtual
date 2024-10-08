@@ -1,0 +1,23 @@
+{% extends "navbar.html" %}
+
+{% block title %}Materias{% endblock %}
+
+{% block extra_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/materias.css') }}">
+{% endblock %}
+
+{% block body %}
+<div>
+    <h1 class="title">Materias del Curso</h1>
+    <div class="card-container">
+        {% for materia in materias %}
+            <div class="card">
+                <div class="card-title">{{ materia.nombre_materia }}</div>
+                <div class="card-description">Descripción breve de la materia.</div>
+                <a href="{{ url_for('mostrar_contenidos', id_materia=materia.id_materia) }}" class="btn">Ver Contenidos</a>
+
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "navbar.html" %}
+
+{% block title %}Contenidos de {{ materia.nombre_materia }}{% endblock %}
+
+{% block extra_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='contenidos.css') }}">
+{% endblock %}
+
+{% block body %}
+<div>
+    <h1>Contenidos de {{ materia.nombre_materia }}</h1>
+    <ul>
+        {% for contenido in contenidos %}
+            <li>{{ contenido.tipo_contenido }}: {{ contenido.descripcion }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

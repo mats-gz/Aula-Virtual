@@ -24,11 +24,19 @@ import os
 app = Flask(__name__)
 load_dotenv()
 
+#compu del negro
 #Conectac on BD, los archivos estan en un usuario .gitignore, se importan con el dotenv y el os
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://51702027:nicolas07.@localhost/AulaVirtual'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Secret key para utilizar Flask-WTF
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['SECRET_KEY'] = 'una_clave_secreta_aleatoria'
+
+#compu del mati
+#Conectac on BD, los archivos estan en un usuario .gitignore, se importan con el dotenv y el os
+    #app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+    #app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Secret key para utilizar Flask-WTF
+    #app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 # Añadirle propiedades a la aplicación
 db = SQLAlchemy(app)
@@ -63,6 +71,45 @@ class Usuario(db.Model, UserMixin):
 
     def get_id(self):
         return self.id_usuario  # Devuelve el ID del usuario
+
+# Modelo Curso
+class Curso(db.Model):
+    __tablename__ = 'Cursos'
+    id_curso = db.Column(db.Integer, primary_key=True)
+    nombre_curso = db.Column(db.String(50), nullable=False)
+
+# Modelo Materia
+class Materia(db.Model):
+    __tablename__ = 'Materias'
+    id_materia = db.Column(db.Integer, primary_key=True)
+    id_curso = db.Column(db.Integer, db.ForeignKey('Cursos.id_curso'))
+    nombre_materia = db.Column(db.String(100), nullable=False)
+    contenidos = db.relationship('Contenido', backref='materia', lazy=True)
+
+# Modelo Contenido
+class Contenido(db.Model):
+    __tablename__ = 'Contenidos'
+    id_contenido = db.Column(db.Integer, primary_key=True)
+    id_materia = db.Column(db.Integer, db.ForeignKey('Materias.id_materia'))
+    tipo_contenido = db.Column(db.Enum('teórico', 'práctico'), nullable=False)
+    descripcion = db.Column(db.Text)
+
+# Modelo Evaluación
+class Evaluacion(db.Model):
+    __tablename__ = 'Evaluaciones'
+    id_evaluacion = db.Column(db.Integer, primary_key=True)
+    id_materia = db.Column(db.Integer, db.ForeignKey('Materias.id_materia'))
+    fecha = db.Column(db.Date)
+    tipo_evaluacion = db.Column(db.Enum('examen', 'tarea', 'proyecto'), nullable=False)
+    descripcion = db.Column(db.Text)
+
+# Modelo Calendario
+class Evento(db.Model):
+    __tablename__ = 'Calendario'
+    id_evento = db.Column(db.Integer, primary_key=True)
+    id_materia = db.Column(db.Integer, db.ForeignKey('Materias.id_materia'))
+    fecha = db.Column(db.Date)
+    evento = db.Column(db.String(100))
 
 
 # Declarar los forms
@@ -130,7 +177,7 @@ def inicio():
         # Asegurarse que el user y la contraseña coincidan con lo que esta en la BD, la contraseña estaria encriptada gracias a Bcrypt
         if user and bcrypt.check_password_hash(user.contraseña, form.contraseña.data):
             login_user(user)
-            return redirect(url_for('casa'))
+            return redirect(url_for('mostrar_cursos'))
         else:
             flash("DNI o contraseña inválidos")  
 
@@ -168,10 +215,25 @@ def registrarse():
     return render_template("registrarse.html", form=form)
 
 
+@app.route('/cursos')
 @login_required
-@app.route('/casa')
-def casa():
-    return render_template("casa.html")
+def mostrar_cursos():
+    cursos = Curso.query.all()
+    return render_template('cursos.html', cursos=cursos)
+
+# Ruta para mostrar Materias
+@app.route('/materias/<int:id_curso>')
+@login_required
+def mostrar_materias(id_curso):
+    materias = Materia.query.filter_by(id_curso=id_curso).all()
+    return render_template('materias.html', materias=materias)
+
+@app.route('/materias/<int:id_materia>/contenidos')
+@login_required
+def mostrar_contenidos(id_materia):
+    contenidos = Contenido.query.filter_by(id_materia=id_materia).all()
+    materia = Materia.query.get_or_404(id_materia)  # Obtener la materia por ID
+    return render_template('contenidos.html', contenidos=contenidos, materia=materia)
 
 if __name__ == "__main__":
     app.run(debug=True)
