@@ -1,5 +1,5 @@
--- Active: 1728344941580@@127.0.0.1@3306
-CREATE DATABASE AulaVirtual
+-- Active: 1722942989265@@127.0.0.1@3306@AulaVirtual
+CREATE DATABASE AulaVirtual;
 
 USE AulaVirtual;
 
@@ -24,18 +24,11 @@ CREATE TABLE Roles (
 );
 
 
--- Tabla de Cursos
-CREATE TABLE Cursos (
-    id_curso INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_curso ENUM('Programación', 'Mecánica')
-);
-
 -- Tabla de Materias
 CREATE TABLE Materias (
     id_materia INT AUTO_INCREMENT PRIMARY KEY,
-    id_curso INT,
     nombre_materia VARCHAR(100),
-    FOREIGN KEY (id_curso) REFERENCES Cursos(id_curso)
+    nombre_profesor varchar(100) NOT NULL
 );
 
 -- Tabla de Contenidos
@@ -57,37 +50,25 @@ CREATE TABLE Evaluaciones (
     FOREIGN KEY (id_materia) REFERENCES Materias(id_materia)
 );
 
--- Tabla de Calendario
+-- Modificar tabla de Calendario para relacionarla con Materias
 CREATE TABLE Calendario (
     id_evento INT AUTO_INCREMENT PRIMARY KEY,
-    id_materia INT,
+    id_materia INT NOT NULL,
     fecha DATE,
     evento VARCHAR(100),
     FOREIGN KEY (id_materia) REFERENCES Materias(id_materia)
 );
 
-
--- Insertar Cursos
-INSERT INTO Cursos (nombre_curso) VALUES
-('Programación'),
-('Mecánica');
-
 -- Insertar Materias
-INSERT INTO Materias (id_curso, nombre_materia) VALUES
-(1, 'Programación I'),
-(2, 'Informatica Aplicada I'),
-(3, 'Redes y Telecomucaciones'),
-(4, 'Mecánica I'),
-(5, 'Elementos de Maquina I'),
-(6, 'Diseño Mecanico I');
+INSERT INTO Materias (nombre_materia, nombre_profesor) VALUES
+('Programación I', "Hector Garcia"),
+('Informatica Aplicada I', "Barrios Christian"),
+('Redes y Telecomucaciones', "Barrios Christian");
 
 INSERT INTO Contenidos (id_materia, tipo_contenido, descripcion) VALUES
 (1, 'teórico', 'Introducción a la Programación.'),       
 (2, 'teórico', 'Introducción a la Informática Aplicada.'), 
-(3, 'teórico', 'Fundamentos de Redes y Telecomunicaciones.'), 
-(4, 'teórico', 'Introducción a la Mecánica.'),          
-(5, 'teórico', 'Conceptos básicos de Elementos de Máquina.'),  
-(6, 'teórico', 'Diseño de Componentes Mecánicos.');     
+(3, 'teórico', 'Fundamentos de Redes y Telecomunicaciones.');
 
 -- Insertar Evaluaciones
 INSERT INTO Evaluaciones (id_materia, fecha, tipo_evaluacion, descripcion) VALUES
@@ -95,12 +76,24 @@ INSERT INTO Evaluaciones (id_materia, fecha, tipo_evaluacion, descripcion) VALUE
 (2, '2024-12-20', 'proyecto', 'Proyecto final de Programación I.')
 
 
--- Insertar Eventos en el Calendario
-INSERT INTO Calendario (id_materia, fecha, evento) VALUES
-(1, '2024-11-15', 'Examen de Programación I'),
-(2, '2024-12-20', 'Entrega de Mecanica I')
+
+INSERT INTO Usuario(nombre, apellido, email, contraseña, dni) VALUES
+('Christian', 'Barrios', 'profe@gmail.com', 'profe12345', '12345678'),
+('Matias', 'Guzman', 'programacion@gmail.com', 'alumno12345', '46587536')
+
+-- Insertar Roles
+INSERT INTO Roles (id_usuario, rol_usuario) VALUES
+(1, 'Profesor'),
+(2, 'Estudiante')
+
+
+
+SELECT Usuario.nombre, Usuario.apellido, Roles.rol_usuario
+FROM Usuario
+INNER JOIN Roles ON Usuario.id_usuario = Roles.id_usuario;
+
 
 
 CREATE USER '51702027'@'localhost' IDENTIFIED BY 'nicolas07.';
 GRANT ALL PRIVILEGES ON AulaVirtual.* TO '51702027'@'localhost';
-FLUSH PRIVILEGES;
+FLUSH PRIVILEGES; esta

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect, flash
+from flask import Flask, render_template, url_for, redirect, flash, abort
 # Import todo lo relacionado a BD
 import mysql.connector
 from flask_sqlalchemy import SQLAlchemy
@@ -17,6 +17,7 @@ from flask_bcrypt import Bcrypt
 # Import lo relacionado al dotenv para cargar todo lo que esta definido en el archivo .env (.gitignore)
 from dotenv import load_dotenv
 import os
+from functools import wraps
 
 
 
@@ -26,17 +27,17 @@ load_dotenv()
 
 #compu del negro
 #Conectac on BD, los archivos estan en un usuario .gitignore, se importan con el dotenv y el os
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://51702027:nicolas07.@localhost/AulaVirtual'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://51702027:nicolas07.@localhost/AulaUniversidad'
+#app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Secret key para utilizar Flask-WTF
-app.config['SECRET_KEY'] = 'una_clave_secreta_aleatoria'
+#app.config['SECRET_KEY'] = 'una_clave_secreta_aleatoria'
 
 #compu del mati
 #Conectac on BD, los archivos estan en un usuario .gitignore, se importan con el dotenv y el os
-    #app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
-    #app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Secret key para utilizar Flask-WTF
-    #app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 # Añadirle propiedades a la aplicación
 db = SQLAlchemy(app)
@@ -50,18 +51,16 @@ bcrypt = Bcrypt(app)
 def user_loader(id_usuario):
     return Usuario.query.get(int(id_usuario))
 
-
-# Definir modelos
-# Modelo Rol
-class Rol(db.Model):
+# Modelo de Rol
+class Roles(db.Model):
     __tablename__ = 'roles'
     id_rol = db.Column(db.Integer, primary_key=True)
-    id_usuario = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), nullable=False)
+    id_usuario = db.Column(db.Integer, db.ForeignKey('usuario.id_usuario'), nullable=False)
     rol_usuario = db.Column(db.String(50), nullable=False)
 
-# Modelo Usuario
+# Modelo de Usuario
 class Usuario(db.Model, UserMixin):
-    __tablename__ = "Usuario"
+    __tablename__ = "usuario"
     id_usuario = db.Column(db.Integer, primary_key=True, autoincrement=True)
     nombre = db.Column(db.String(50), nullable=False)
     apellido = db.Column(db.String(50), nullable=False)
@@ -69,21 +68,19 @@ class Usuario(db.Model, UserMixin):
     contraseña = db.Column(db.String(255), nullable=False)
     dni = db.Column(db.Integer, nullable=False, unique=True)
 
-    def get_id(self):
-        return self.id_usuario  # Devuelve el ID del usuario
+    # Aquí se permite que un usuario tenga múltiples roles
+    roles = db.relationship('Roles', backref='usuario', uselist=False)
 
-# Modelo Curso
-class Curso(db.Model):
-    __tablename__ = 'Cursos'
-    id_curso = db.Column(db.Integer, primary_key=True)
-    nombre_curso = db.Column(db.String(50), nullable=False)
+    def get_id(self):
+        return self.id_usuario
+
 
 # Modelo Materia
 class Materia(db.Model):
     __tablename__ = 'Materias'
     id_materia = db.Column(db.Integer, primary_key=True)
-    id_curso = db.Column(db.Integer, db.ForeignKey('Cursos.id_curso'))
     nombre_materia = db.Column(db.String(100), nullable=False)
+    nombre_profesor = db.Column(db.String(100), nullable=False)
     contenidos = db.relationship('Contenido', backref='materia', lazy=True)
 
 # Modelo Contenido
@@ -163,6 +160,47 @@ class FormRegistro(FlaskForm):
 
     submit = SubmitField('Iniciar sesión')
 
+# Formulario para crear materias
+class FormMateria(FlaskForm):
+    nombre_materia = StringField(
+        "Nombre de la materia",
+        validators=[InputRequired(), Length(max=100)],
+        render_kw={"placeholder": "Nombre materia"}
+    )
+
+    nombre_profesor = StringField(
+        "Nombre del profesor",
+        validators=[InputRequired(), Length(max=100)],
+        render_kw={"placeholder": "Nombre profesor"}
+    )
+
+    submit = SubmitField("Crear materia")
+
+# Decorador para requerir un rol específico
+def rol_requerido(rol):
+    def decorador(f):
+        @wraps(f)
+        def decorado_funcion(*args, **kwargs):
+            # Revisa si el usuario actual tiene el rol requerido
+            user_rol = Roles.query.filter_by(id_usuario=current_user.id_usuario).first()
+            if user_rol:
+                print(f"Usuario {current_user.id_usuario} tiene rol: {user_rol.rol_usuario}")
+            else:
+                print(f"Rol no encontrado para el usuario {current_user.id_usuario}")
+            
+            # Verifica si el rol coincide
+            if user_rol and user_rol.rol_usuario == rol:
+                return f(*args, **kwargs)
+            else:
+                abort(403)
+        return decorado_funcion
+    return decorador
+
+# Cargar usuario
+@login_manager.user_loader
+def load_user(user_id):
+    return Usuario.query.get(int(user_id))
+
 
 # Declaración de rutas
 @app.route('/', methods = ["GET", "POST"])
@@ -177,11 +215,11 @@ def inicio():
         # Asegurarse que el user y la contraseña coincidan con lo que esta en la BD, la contraseña estaria encriptada gracias a Bcrypt
         if user and bcrypt.check_password_hash(user.contraseña, form.contraseña.data):
             login_user(user)
-            return redirect(url_for('mostrar_cursos'))
+            return redirect(url_for('materias'))
         else:
             flash("DNI o contraseña inválidos")  
 
-    return render_template('inicio.html', form=form)
+    return render_template('iniciar_sesion.html', form=form)
 
 @app.route("/registrarse", methods = ["GET", "POST"])
 def registrarse():
@@ -214,26 +252,27 @@ def registrarse():
     
     return render_template("registrarse.html", form=form)
 
-
-@app.route('/cursos')
 @login_required
-def mostrar_cursos():
-    cursos = Curso.query.all()
-    return render_template('cursos.html', cursos=cursos)
+@app.route("/materias", methods=["POST", "GET"])
+def materias():
+    materias = Materia.query.all()
 
-# Ruta para mostrar Materias
-@app.route('/materias/<int:id_curso>')
-@login_required
-def mostrar_materias(id_curso):
-    materias = Materia.query.filter_by(id_curso=id_curso).all()
-    return render_template('materias.html', materias=materias)
+    form = FormMateria()
 
-@app.route('/materias/<int:id_materia>/contenidos')
-@login_required
-def mostrar_contenidos(id_materia):
-    contenidos = Contenido.query.filter_by(id_materia=id_materia).all()
-    materia = Materia.query.get_or_404(id_materia)  # Obtener la materia por ID
-    return render_template('contenidos.html', contenidos=contenidos, materia=materia)
+    if form.validate_on_submit():
+        nueva_materia = Materia(
+            nombre_materia = form.nombre_materia.data,
+            nombre_profesor = form.nombre_profesor.data
+        )
+
+        db.session.add(nueva_materia)
+        db.session.commit()
+
+        flash("Materia creada con exito.")
+        return redirect(url_for("materias"))
+
+    return render_template("materias.html", materias=materias, form=form)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
