@@ -1,14 +1,11 @@
-{% extends "navbar.html" %}
-
-{% block title %}Registrarse{% endblock %}
-
 {% block extra_styles %}
+<title>Registrarse</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/registrarse.css') }}" />
 {% endblock %}
 
 {% block body %}
-<div>
-    <h1>El form Registrarse</h1>
+<div class="form-container">
+    <h1>Registrarse</h1>
     <form action="" method="POST">
         {{ form.hidden_tag() }}
         {{ form.email }}
@@ -16,7 +13,9 @@
         {{ form.apellido }}
         {{ form.dni }}
         {{ form.contraseña }}
-        {{ form.submit }}  
+        <button type="submit">{{ form.submit.label }}</button>  
     </form>
+    
+    <a href="{{ url_for('iniciar_sesion') }}">Iniciar sesión</a>
 </div>
 {% endblock %}

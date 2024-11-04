@@ -31,23 +31,34 @@ CREATE TABLE Materias (
     nombre_profesor varchar(100) NOT NULL
 );
 
--- Tabla de Contenidos
-CREATE TABLE Contenidos (
-    id_contenido INT AUTO_INCREMENT PRIMARY KEY,
-    id_materia INT,
-    tipo_contenido ENUM('teórico', 'práctico'),
-    descripcion TEXT,
-    FOREIGN KEY (id_materia) REFERENCES Materias(id_materia)
+-- Tabla Modulo
+CREATE TABLE Modulo (
+    id_modulo INT AUTO_INCREMENT PRIMARY KEY,
+    id_materia INT NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    FOREIGN KEY (id_materia) REFERENCES Materias(id_materia) ON DELETE CASCADE
 );
 
--- Tabla de Evaluaciones
-CREATE TABLE Evaluaciones (
-    id_evaluacion INT AUTO_INCREMENT PRIMARY KEY,
-    id_materia INT,
-    fecha DATE,
-    tipo_evaluacion ENUM('examen', 'tarea', 'proyecto'),
-    descripcion TEXT,
-    FOREIGN KEY (id_materia) REFERENCES Materias(id_materia)
+-- Tabla Contenidos
+CREATE TABLE Contenido(
+    id_contenido INT AUTO_INCREMENT PRIMARY KEY,
+    id_modulo INT NOT NULL,
+    titulo VARCHAR(100) NOT NULL,
+    descripcion VARCHAR(200) NOT NULL,
+    archivo_pdf VARCHAR(255),  -- Campo para almacenar el PDF
+    FOREIGN KEY (id_modulo) REFERENCES Modulo(id_modulo) ON DELETE CASCADE
+)
+
+-- Tabla ContenidoUsuario (relaciona el contenido con el usuario y el estado de completado)
+CREATE TABLE ContenidoUsuario (
+    id_contUsuario INT AUTO_INCREMENT NOT NULL,
+    id_contenido INT NOT NULL,
+    id_usuario INT NOT NULL,
+    enlace VARCHAR(255),
+    completado BOOLEAN DEFAULT FALSE,
+    PRIMARY KEY (id_contUsuario),
+    FOREIGN KEY (id_contenido) REFERENCES Contenido(id_contenido) ON DELETE CASCADE,
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario) ON DELETE CASCADE
 );
 
 -- Modificar tabla de Calendario para relacionarla con Materias
@@ -59,23 +70,34 @@ CREATE TABLE Calendario (
     FOREIGN KEY (id_materia) REFERENCES Materias(id_materia)
 );
 
+-- Insertar ContenidoUsuarios
+INSERT INTO ContenidoUsuario (id_contenido, id_usuario, completado) VALUES
+(1, 2, TRUE),
+(2, 2, FALSE),
+(3, 2, FALSE);
+
+INSERT INTO ContenidoUsuario (id_contenido, id_usuario, completado) VALUES
+(1, 2),
+(2, 2),
+(3, 2);
+
 -- Insertar Materias
 INSERT INTO Materias (nombre_materia, nombre_profesor) VALUES
 ('Programación I', "Hector Garcia"),
 ('Informatica Aplicada I', "Barrios Christian"),
 ('Redes y Telecomucaciones', "Barrios Christian");
 
-INSERT INTO Contenidos (id_materia, tipo_contenido, descripcion) VALUES
-(1, 'teórico', 'Introducción a la Programación.'),       
-(2, 'teórico', 'Introducción a la Informática Aplicada.'), 
-(3, 'teórico', 'Fundamentos de Redes y Telecomunicaciones.');
+-- Insertar Módulos
+INSERT INTO Modulo (id_materia, nombre) VALUES
+(1, 'Módulo 1 - Introducción a la Programación'),
+(2, 'Módulo 2 - Introducción a la Informática Aplicada'),
+(3, 'Módulo 3 - Fundamentos de Redes y Telecomunicaciones');
 
--- Insertar Evaluaciones
-INSERT INTO Evaluaciones (id_materia, fecha, tipo_evaluacion, descripcion) VALUES
-(1, '2024-11-15', 'examen', 'Examen final de Programación I.'),
-(2, '2024-12-20', 'proyecto', 'Proyecto final de Programación I.')
-
-
+-- Insertar Contenidos
+INSERT INTO Contenido (id_modulo, titulo, descripcion, archivo_pdf) VALUES
+(1, 'Teórico - Introducción a la Programación con Javascript', 'Hoy veremos una breve introducción a Javascript, sus variables, tipo de datos, entre otros.', 'JavaScript_Guia_ref_rap.pdf'),
+(1, 'Teórico - Introducción a React', 'Hoy veremos una breve introducción a React, para que sirve, como usarlo, entre otros', 'Practico1_React.pdf'),
+(1, 'Práctico React', 'Hoy haremos nuestro primer práctico con React, les adjunto el archivo.', 'Practico2_React.pdf');
 
 INSERT INTO Usuario(nombre, apellido, email, contraseña, dni) VALUES
 ('Christian', 'Barrios', 'profe@gmail.com', 'profe12345', '12345678'),
@@ -96,4 +118,4 @@ INNER JOIN Roles ON Usuario.id_usuario = Roles.id_usuario;
 
 CREATE USER '51702027'@'localhost' IDENTIFIED BY 'nicolas07.';
 GRANT ALL PRIVILEGES ON AulaVirtual.* TO '51702027'@'localhost';
-FLUSH PRIVILEGES; esta
+FLUSH PRIVILEGES; 

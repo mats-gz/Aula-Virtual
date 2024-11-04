@@ -1,0 +1,92 @@
+/* Estilos generales del contenedor principal */
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Estilos de la barra lateral */
+.sidebar {
+    background: linear-gradient(135deg, #88b04b 0%, #66a739 100%);
+    color: #333;
+    width: 20%; /* Barra lateral ocupa el 20% del ancho */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.sidebar h2 {
+    font-size: 2.5em;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.sidebar a {
+    color: #333;
+    text-decoration: none;
+    padding: 15px 20px;
+    width: 100%;
+    text-align: center;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.sidebar a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu-item img {
+    margin-right: 10px;
+    width: 80px;
+    height: 80px;
+}
+
+/* Estilos del contenido principal */
+.main-content {
+    flex-grow: 1; /* El contenido principal ocupa el espacio restante */
+    padding: 20px;
+}
+
+/* Ajuste para tablets */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        padding: 10px 0;
+    }
+
+    .menu-item img {
+        width: 60px;
+        height: 60px;
+    }
+    .container {
+        flex-direction: column;
+    }
+}
+
+/* Ajuste para teléfonos */
+@media (max-width: 480px) {
+    .sidebar h2 {
+        font-size: 2em;
+    }
+
+    .sidebar a {
+        font-size: 1em;
+        padding: 10px 15px;
+    }
+
+    .menu-item img {
+        width: 40px;
+        height: 40px;
+    }
+}

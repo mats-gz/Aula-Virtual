@@ -7,13 +7,37 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
     {% block extra_styles %}{% endblock %}
 </head>
-
 <body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Aula Virtual</h2>
+            
+            <nav>
+                <div>
+                    <a href="{{ url_for('inicio') }}" class="menu-item">
+                        <img src="{{ url_for('static', filename='css/inicio.png') }}" alt="Inicio"> Inicio
+                    </a>
+                </div>
 
-    <div>
-        {% block body %}
-        {% endblock %}
+                <div>
+                    <a href="{{ url_for('materias') }}" class="menu-item">
+                        <img src="{{ url_for('static', filename='css/clases.png') }}" alt="Cursos"> Cursos
+                    </a>
+                </div>
+
+                <div>
+                    <a href="{{ url_for('iniciar_sesion') }}" class="menu-item">
+                        <img src="{{ url_for('static', filename='css/salida.png') }}" alt="Salir"> Salir
+                    </a>
+                </div>
+            </nav>
+
+      
+        </aside>
+        <div class="main-content">
+            {% block body %}
+            {% endblock %}
+        </div>
     </div>
-
 </body>
 </html>

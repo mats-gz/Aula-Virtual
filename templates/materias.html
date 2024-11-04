@@ -12,17 +12,19 @@
     <div class="card-container">
         {% for materia in materias %}
             <div class="card">
-                <div class="card-title">{{ materia.nombre_materia }}</div>
-                <div class="card-description">{{ materia.nombre_profesor }}</div>
+                <a href="{{ url_for('contenidos', materia_id=materia.id_materia) }}">
+                    <div class="card-title">{{ materia.nombre_materia }}</div>
+                    <div class="card-description">{{ materia.nombre_profesor }}</div>
+                </a>
             </div>
         {% endfor %}
     </div>
+</div>
+
 
     <p>Rol actual: {{ current_user.roles.rol_usuario }}</p>
 
-
     {% if current_user.roles.rol_usuario == "Profesor" %}
-    <!-- Crear botón que solo se renderiza si tu rol es profesor -->
     <a href="{{ url_for('materias') }}" class="btn" id="abrirModalBtn">Crear Nueva Materia</a>
 
     <!-- Modal -->
@@ -49,33 +51,30 @@
     </div>
     {% endif %}
 
-
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-    var modal = document.getElementById("myModal");
-    var btnAbrir = document.getElementById("abrirModalBtn");
-    var btnCerrar = document.getElementById("closeModalBtn");
+            var modal = document.getElementById("myModal");
+            var btnAbrir = document.getElementById("abrirModalBtn");
+            var btnCerrar = document.getElementById("closeModalBtn");
 
-    // Abrir el modal
-    btnAbrir.addEventListener("click", function(event) {
-        event.preventDefault(); // Previene la recarga
-        modal.style.display = "block";
-    });
+            // Abrir el modal
+            btnAbrir.addEventListener("click", function(event) {
+                event.preventDefault(); // Previene la recarga
+                modal.style.display = "block";
+            });
 
-    // Cerrar el modal
-    btnCerrar.addEventListener("click", function() {
-        modal.style.display = "none";
-    });
-
-    // Cerrar el modal al hacer clic fuera
-    window.onclick = function(event) {
-            if (event.target == modal) {
+            // Cerrar el modal
+            btnCerrar.addEventListener("click", function() {
                 modal.style.display = "none";
+            });
+
+            // Cerrar el modal al hacer clic fuera
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
             }
-        }
-    });
-
+        });
     </script>
-
 </div>
 {% endblock %}
