@@ -1,47 +1,136 @@
-/* Estilos Generales */
-* {
-    box-sizing: border-box;
-}
+/* inicio.css */
 
-body, html {
-    margin: 0;
-    padding: 0;
+body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
-    height: 100%;
+    margin: 0;
 }
 
-/* Contenedor principal de la página de inicio */
-.container {
+.dashboard-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     width: 100%;
-    min-height: 100vh;
-    text-align: center;
     padding: 20px;
 }
 
-/* Título de la página */
-h1 {
+.title h1 {
+    font-size: 24px;
+    margin: 0;
     text-align: center;
-    font-size: 2em;
-    color: #333;
-    margin: 20px 0;
+    color: #88b04b;
 }
 
-/* Media Queries para adaptabilidad */
-@media (max-width: 768px) {
-    h1 {
-        font-size: 2em;
-        padding: 10px 20px;
-    }
+.title p {
+    font-size: 16px;
+    color: #666;
+    margin-top: 5px;
 }
 
-@media (max-width: 480px) {
-    h1 {
-        font-size: 1.5em;
-        padding: 8px 16px;
-    }
+/* Contenedor de tarjetas */
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* Tarjeta individual */
+.card {
+    background-color: #88b04b;
+    color: #f4f4f4;
+    border-radius: 8px;
+    padding: 20px;
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.card a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Título de la tarjeta */
+.card-title {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+/* Descripción de la tarjeta */
+.card-description {
+    font-size: 16px;
+    color: #e0e0e0;
+}
+
+/* Fila para saludo y frase inspiradora */
+.header-row {
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.saludo, .frase-inspiradora {
+    background-color: #88b04b;
+    color: #f4f4f4;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.saludo {
+    margin-right: 10px;
+}
+
+.frase-inspiradora {
+    margin-left: 10px;
+    width: 100%;
+    height: 100px;
+}
+
+.saludo h2 {
+    font-size: 28px;
+    margin: 0;
+}
+
+.frase-inspiradora p {
+    font-size: 18px;
+    font-style: italic;
+    margin: 0;
+    text-align: center;
+}
+
+/* Fecha y hora */
+.fecha-hora {
+    background-color: #88b04b;
+    color: #f4f4f4;
+    padding: 20px;
+    margin-top: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#fecha-hora-actual {
+    font-size: 20px;
+    color: #f4f4f4;
+    margin-top: 10px;
+}
+
+#mensaje-saludo, #frase-del-dia {
+    font-size: 22px;
+    font-weight: bold;
 }

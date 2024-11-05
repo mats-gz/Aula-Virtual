@@ -7,7 +7,85 @@
 {% endblock %}
 
 {% block body %}
-<div>
+<div class="title">
     <h1>Inicio</h1>
 </div>
+<div class="dashboard-container">
+    <!-- Fila para saludo y frase inspiradora -->
+    <div class="header-row">
+        <div class="saludo">
+            <h2 id="mensaje-saludo"></h2>
+        </div>
+        
+        <div class="frase-inspiradora">
+            <p id="frase-del-dia"></p>
+        </div>
+    </div>
+
+    <!-- Cuadro de Fecha y Hora Actual -->
+    <div class="fecha-hora">
+        <h2>Fecha y Hora</h2>
+        <p id="fecha-hora-actual"></p>
+    </div>
+</div>
+
+<div>
+    <div class="title">
+        <h1>Acceso rápido</h1>
+    </div>
+    <div class="card-container">
+        {% for materia in materias %}
+            <div class="card">
+                <a href="{{ url_for('contenidos', materia_id=materia.id_materia) }}">
+                    <div class="card-title">{{ materia.nombre_materia }}</div>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    function actualizarSaludo() {
+        var ahora = new Date();
+        var hora = ahora.getHours();
+        var saludo;
+
+        if (hora < 12) {
+            saludo = "¡Buenos días!";
+        } else if (hora < 18) {
+            saludo = "¡Buenas tardes!";
+        } else {
+            saludo = "¡Buenas noches!";
+        }
+
+        document.getElementById("mensaje-saludo").innerText = saludo;
+    }
+    actualizarSaludo();
+</script>
+
+<script>
+    const frases = [
+        "El éxito es la suma de pequeños esfuerzos repetidos día tras día.",
+        "Cree en ti mismo y todo será posible.",
+        "No hay límites para quien persevera.",
+        "Hoy es un buen día para comenzar algo nuevo.",
+        "Cada día trae nuevas oportunidades, aprovéchalas."
+    ];
+
+    document.getElementById("frase-del-dia").innerText = frases[Math.floor(Math.random() * frases.length)];
+</script>
+
+<script>
+    function actualizarFechaHora() {
+        var ahora = new Date();
+        var opcionesFecha = { year: 'numeric', month: 'long', day: 'numeric' };
+        var opcionesHora = { hour: 'numeric', minute: 'numeric'};
+        
+        var fecha = ahora.toLocaleDateString('es-ES', opcionesFecha);
+        var hora = ahora.toLocaleTimeString('es-ES', opcionesHora);
+        
+        document.getElementById("fecha-hora-actual").innerText = fecha + " " + hora;
+    }
+    setInterval(actualizarFechaHora, 1000); // Actualiza cada segundo
+</script>
 {% endblock %}

@@ -8,7 +8,10 @@
 
 {% block body %}
 <div>
-    <h1 class="title">Materias del Curso</h1>
+    <div class="title">
+        <h1>Materias del Curso</h1>
+        <p>Rol actual: {{ current_user.roles.rol_usuario }}</p>
+    </div>
     <div class="card-container">
         {% for materia in materias %}
             <div class="card">
@@ -20,9 +23,6 @@
         {% endfor %}
     </div>
 </div>
-
-
-    <p>Rol actual: {{ current_user.roles.rol_usuario }}</p>
 
     {% if current_user.roles.rol_usuario == "Profesor" %}
     <a href="{{ url_for('materias') }}" class="btn" id="abrirModalBtn">Crear Nueva Materia</a>

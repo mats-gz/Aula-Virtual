@@ -10,40 +10,129 @@
 <div class="center-container">
     <div class="title-container">
         <h1>Contenidos de {{ materia.nombre_materia }}</h1>
-    </div>
-
-    <div class="professor-container">
         <h2>Profesor: {{ materia.nombre_profesor }}</h2>
     </div>
 </div>
 
 <div class="contenidos-container">
     {% for modulo in modulos %}
-        <!-- Título del módulo sin funcionalidad desplegable -->
-        <h2 class="module-title">{{ modulo.nombre }}</h2>
+        <div class="modulo-card">
+            <details>
+                <summary class="module-title">{{ modulo.nombre }}</summary>
 
-        <!-- Iteración sobre cada contenido del módulo, creando un details individual -->
-        {% for contenido in contenidos %}
-            {% if contenido.modulo_id == modulo.id %}
-                <details>
-                    <summary class="content-title">{{ contenido.titulo }}</summary>
-                    <div class="content-body">
-                        <p>{{ contenido.descripcion }}</p>
-
-                        {% if contenido.archivo_pdf %}
-                            <!-- Mostrar la vista previa del PDF -->
-                            <div class="pdf-preview">
-                                <iframe src="{{ url_for('static', filename='uploads/' + contenido.archivo_pdf) }}" 
-                                        width="100%" height="400px">
-                                </iframe>
+                <!-- Apartado para contenidos teóricos -->
+                <div class="teoricos-container">
+                    <h3>Contenidos Teóricos</h3>
+                    {% for contenido in contenidos %}
+                        {% if contenido.modulo_id == modulo.id and contenido.titulo.startswith("Teórico") %}
+                            <div class="content-box">
+                                <details class="content-card">
+                                    <summary class="content-title">{{ contenido.titulo }}</summary>
+                                    <div class="content-body">
+                                        <p>{{ contenido.descripcion }}</p>
+                                        {% if contenido.archivo_pdf %}
+                                            <div class="pdf-preview">
+                                                <iframe src="{{ url_for('static', filename='uploads/' + contenido.archivo_pdf) }}" 
+                                                        width="100%" height="400px">
+                                                </iframe>
+                                            </div>
+                                        {% else %}
+                                            <p>No hay PDF disponible para este contenido teórico.</p>
+                                        {% endif %}
+                                    </div>
+                                </details>
                             </div>
-                        {% else %}
-                            <p>No hay PDF disponible para este contenido.</p>
                         {% endif %}
-                    </div>
-                </details>
-            {% endif %}
-        {% endfor %}
+                    {% endfor %}
+                </div>
+
+                <!-- Apartado para contenidos prácticos -->
+                <div class="practicos-container">
+                    <h3>Contenidos Prácticos</h3>
+                    {% for contenido in contenidos %}
+                        {% if contenido.modulo_id == modulo.id and contenido.titulo.startswith("Práctico") %}
+                            <div class="content-box">
+                                <details class="content-card">
+                                    <summary class="content-title">{{ contenido.titulo }}</summary>
+                                    <div class="content-body">
+                                        <p>{{ contenido.descripcion }}</p>
+
+                                        {% if contenido.archivo_pdf %}
+                                            <div class="pdf-preview">
+                                                <iframe src="{{ url_for('static', filename='uploads/' + contenido.archivo_pdf) }}" 
+                                                        width="100%" height="400px">
+                                                </iframe>
+                                            </div>
+                                        {% else %}
+                                            <p>No hay PDF disponible para este contenido práctico.</p>
+                                        {% endif %}
+
+                                        <!-- Botón de entrega para el práctico -->
+                                        {% if contenido_id not in entregas_ids %}
+                                            <form method="post" enctype="multipart/form-data">
+                                                <input type="file" name="archivo" class="file-input">
+                                                <button type="submit" class="btn-entrega">Entregar Práctico</button>
+                                            </form>
+                                        {% else %}
+                                            <p>Ya has entregado el práctico.</p>
+                                        {% endif %}
+                                    </div>
+                                </details>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <!-- Apartado para la evaluación -->
+                <div class="evaluaciones-container">
+                    <h3>Evaluación</h3>
+                    {% for contenido in contenidos %}
+                        {% if contenido.modulo_id == modulo.id and contenido.titulo == "Evaluacion" %}
+                            {% set tarea_previas_completadas = true %}
+                            {% for tarea in contenidos %}
+                                {% if tarea.modulo_id == modulo.id and tarea.titulo != "Evaluacion" %}
+                                    {% if tarea.id_contenido not in completados_ids %}
+                                        {% set tarea_previas_completadas = false %}
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if tarea_previas_completadas %}
+                                <div class="content-box">
+                                    <details class="content-card">
+                                        <summary class="content-title content-title-evaluacion">{{ contenido.titulo }}</summary>
+                                        <div class="content-body">
+                                            <p>{{ contenido.descripcion }}</p>
+                                            {% if contenido.archivo_pdf %}
+                                                <div class="pdf-preview">
+                                                    <iframe src="{{ url_for('static', filename='uploads/' + contenido.archivo_pdf) }}" 
+                                                            width="100%" height="400px">
+                                                    </iframe>
+                                                </div>
+                                            {% else %}
+                                                <p>No hay PDF disponible para esta evaluación.</p>
+                                            {% endif %}
+                                            {% if contenido_id in entregas_ids %}
+                                                <p>Ya has entregado el práctico. Puedes proceder a enviar la evaluación.</p>
+                                                <form method="post" enctype="multipart/form-data">
+                                                    <input type="file" name="archivo" class="file-input">
+                                                    <button type="submit" class="btn-entrega">Enviar Evaluación</button>
+                                                </form>
+                                            {% else %}
+                                                <p>No has entregado el práctico. Completa la entrega antes de acceder a la evaluación.</p>
+                                                <button type="button" class="btn-entrega" disabled>Enviar Evaluación</button>
+                                            {% endif %}
+                                        </div>
+                                    </details>
+                                </div>
+                            {% else %}
+                                <p>Completa las tareas previas para poder acceder a la evaluación.</p>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </details>
+        </div>
     {% else %}
         <p>No hay módulos o contenidos para esta materia.</p>
     {% endfor %}

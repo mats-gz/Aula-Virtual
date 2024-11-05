@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 import os
 from functools import wraps
 
+
 # Inicialización de la app
 app = Flask(__name__)
 load_dotenv()
@@ -228,10 +229,6 @@ def iniciar_sesion():
             flash("DNI o contraseña inválidos")
     return render_template('iniciar_sesion.html', form=form)
 
-@login_required
-@app.route("/inicio", methods=["GET", "POST"])
-def inicio():
-    return render_template("inicio.html")
 
 @app.route("/registrarse", methods=["GET", "POST"])
 def registrarse():
@@ -284,6 +281,13 @@ def contenidos(materia_id):
     contenidos = Contenido.query.filter(Contenido.id_modulo.in_([modulo.id_modulo for modulo in modulos])).all()
     
     return render_template("contenidos.html", materia=materia, contenidos=contenidos, modulos=modulos)
+
+@login_required
+@app.route("/inicio", methods=["GET", "POST"])
+def inicio():
+    materias = Materias.query.all()
+    
+    return render_template("inicio.html", materias=materias)
 
 
 

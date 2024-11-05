@@ -3,6 +3,7 @@ CREATE DATABASE AulaVirtual;
 
 USE AulaVirtual;
 
+
 -- Crear tabla USUARIO
 CREATE TABLE Usuario (
     id_usuario INT NOT NULL AUTO_INCREMENT,
@@ -93,11 +94,13 @@ INSERT INTO Modulo (id_materia, nombre) VALUES
 (2, 'Módulo 2 - Introducción a la Informática Aplicada'),
 (3, 'Módulo 3 - Fundamentos de Redes y Telecomunicaciones');
 
--- Insertar Contenidos
+ 
 INSERT INTO Contenido (id_modulo, titulo, descripcion, archivo_pdf) VALUES
 (1, 'Teórico - Introducción a la Programación con Javascript', 'Hoy veremos una breve introducción a Javascript, sus variables, tipo de datos, entre otros.', 'JavaScript_Guia_ref_rap.pdf'),
 (1, 'Teórico - Introducción a React', 'Hoy veremos una breve introducción a React, para que sirve, como usarlo, entre otros', 'Practico1_React.pdf'),
-(1, 'Práctico React', 'Hoy haremos nuestro primer práctico con React, les adjunto el archivo.', 'Practico2_React.pdf');
+(1, 'Práctico React', 'Hoy haremos nuestro primer práctico con React, les adjunto el archivo.', 'Practico2_React.pdf'),
+(1, 'Evaluacion', 'Aquí encontrarás el material para las evaluaciones de los temas vistos.', 'Evaluacion1_React.pdf');
+
 
 INSERT INTO Usuario(nombre, apellido, email, contraseña, dni) VALUES
 ('Christian', 'Barrios', 'profe@gmail.com', 'profe12345', '12345678'),
@@ -105,8 +108,8 @@ INSERT INTO Usuario(nombre, apellido, email, contraseña, dni) VALUES
 
 -- Insertar Roles
 INSERT INTO Roles (id_usuario, rol_usuario) VALUES
-(1, 'Profesor'),
-(2, 'Estudiante')
+(3, 'Profesor'),
+(4, 'Estudiante')
 
 
 
